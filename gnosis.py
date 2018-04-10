@@ -1,4 +1,4 @@
-import  random
+import random
 import logging
 
 
@@ -6,6 +6,12 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 def books_from_data(filepath):
+    '''
+    Convert a txt file containing data about books
+    in a usable data structure.
+    :param filepath: path to file
+    :return: list of dicts
+    '''
     data =[]
     with open(filepath) as books:
         for book in books:
@@ -15,6 +21,12 @@ def books_from_data(filepath):
 
 
 def users_from_data(filepath):
+    '''
+    Convert a txt file containing user names and their ratings for
+    certain books into a usable data structure
+    :param filepath: path to file
+    :return: dict
+    '''
     names = []
     ratings = []
     index = 0
@@ -32,10 +44,22 @@ def users_from_data(filepath):
 
 
 def similarity(ratings_a, ratings_b):
+    '''
+    calculates the similarity between two lists of book ratings
+    :param ratings_a: list of book ratings
+    :param ratings_b: list of book ratings
+    :return: int
+    '''
     return sum([rating_a * rating_b for rating_a, rating_b in zip(ratings_a, ratings_b)])
 
 
 def check_user(name):
+    '''
+    checks if user exists in user data structure. if not the user is prompted to
+    rate 20% of the books in the books data structure.
+    :param name: name of user
+    :return: list
+    '''
     if name not in users:
         logging.info('Redo: check user {} not in users'.format(name))
         books_rated = 0
@@ -63,6 +87,12 @@ def check_user(name):
 
 
 def most_similar(name, ratings):
+    '''
+    calculates a list of similar users based on the similarity of book taste
+    :param name: name of user
+    :param ratings: list of book ratings
+    :return: list of lists
+    '''
     scores = []
     for user in users:
         if user != name:
@@ -74,13 +104,19 @@ def most_similar(name, ratings):
 
 
 def book_recommendations(amount=10):
+    '''
+    Finds a certain number of books based on the book taste for a specific user
+    :param amount: amount of books
+    :return: list of dicts
+    '''
     books_to_show = []
     user_index = 0
     while len(books_to_show) < amount:
         for i, _ in enumerate(books):
             user_name = similar_users[user_index][1]
-            if users[user_name][i] >= 3 and user_ratings[i] == 0:
-                books_to_show.append({'Name': books[i]['Book'], 'By': user_name})
+            book_name = books[i]['Book']
+            if users[user_name][i] >= 3 and user_ratings[i] == 0 and book_name not in books_to_show:
+                books_to_show.append({'Name':book_name , 'By': user_name})
         user_index += 1
     return books_to_show[:amount]
 
@@ -95,11 +131,11 @@ book_amount = int(input('How many books would you like? '))
 logging.debug('Checking if book_amount : {} is less than total books : {}'.format(book_amount, len(books)))
 check = False
 while not check:
-   if book_amount <= len(books):
-       check = True
-   else:
-       print('Error: Invalid Amount!')
-       book_amount = int(input('How many books would you like? '))
+    if book_amount <= len(books):
+        check = True
+    else:
+        print('Error: Invalid Amount!')
+        book_amount = int(input('How many books would you like? '))
 
 books_list = book_recommendations(book_amount)
 print(len(books_list))
